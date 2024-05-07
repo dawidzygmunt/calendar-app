@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  basePath: process.env.NEXT_API_URL,
+  basePath: "/",
   async headers() {
     return [
       {
