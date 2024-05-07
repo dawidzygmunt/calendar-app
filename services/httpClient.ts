@@ -2,7 +2,9 @@ import axios from "axios";
 
 class HttpClient<Type extends { id: string }, CreateType, EditType> {
   client = axios.create({
-    baseURL: process.env.NEXT_API_URL || "http://localhost:3000/api/",
+    baseURL:
+      process.env.NEXT_API_URL ||
+      "https://calendar-daqejg4oc-dawids-projects-43407acf.vercel.app/api/",
   });
   endpoint: string;
 
