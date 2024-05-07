@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  basePath: "/",
+  basePath: "",
   async headers() {
     return [
       {
