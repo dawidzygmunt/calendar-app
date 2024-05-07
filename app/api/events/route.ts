@@ -6,7 +6,7 @@ export async function GET() {
     const events = await prismadb.event.findMany();
     return NextResponse.json(events);
   } catch (error) {
-    //console.log(error);
+    console.log(error);
 
     return new NextResponse("Internal error ", { status: 500 });
   }
