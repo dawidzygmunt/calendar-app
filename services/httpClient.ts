@@ -24,10 +24,8 @@ class HttpClient<Type extends { id: string }, CreateType, EditType> {
     return data;
   };
 
-  delete = async (eventType: Type) => {
-    const { data } = await this.client.delete<Type>(
-      `${this.endpoint}/${eventType.id}`
-    );
+  delete = async (id: string) => {
+    const { data } = await this.client.delete<Type>(`${this.endpoint}/${id}`);
     return data;
   };
 

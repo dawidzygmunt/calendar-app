@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   CircularProgress,
   FormControl,
@@ -23,6 +24,8 @@ import convertDateToHoursMinutes from '../helpers/convertDateToHoursMinutes'
 import convertDateTimeToDate from '../helpers/convertDateTimeToDate'
 import { useEventEdit } from '../hooks/events/useEventEdit'
 import useEvent from '../hooks/events/useEvent'
+import { useEventDelete } from '@/hooks/events/useEventDelete'
+
 
 interface Props {
   isOpen: boolean
@@ -46,6 +49,7 @@ const ModalEditEvent = ({ isOpen, onClose, id }: Props) => {
   const [selectedType, setSelectedType] = useState('')
   const { data: eventTypes } = useEventTypes()
   const { mutate: editEvent } = useEventEdit(id)
+  const { mutate: deleteEvent } = useEventDelete(id)
   const { isPending, data: event } = useEvent(id)
 
   const [form, setForm] = useState({
@@ -216,13 +220,27 @@ const ModalEditEvent = ({ isOpen, onClose, id }: Props) => {
           )}
         </ModalBody>
 
-        <ModalFooter>
-          <Button onClick={handleClickAdd} colorScheme="green" variant="solid">
-            Edit
+        <ModalFooter display="flex" width="100%" justifyContent="space-between">
+          <Button
+            onClick={() => {
+              onClose();
+              deleteEvent()
+            }
+            }
+            colorScheme="red"
+            variant="solid"
+            marginInline={2}
+          >
+            Delete
           </Button>
-          <Button colorScheme="red" mr={3} onClick={onClose}>
-            Close
-          </Button>
+          <Box>
+            <Button colorScheme="orange" marginInline={3} onClick={onClose}>
+              Close
+            </Button>
+            <Button onClick={handleClickAdd} colorScheme="blue" variant="solid">
+              Submit
+            </Button>
+          </Box>
         </ModalFooter>
       </ModalContent>
     </Modal>

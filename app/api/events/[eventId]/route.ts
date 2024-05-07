@@ -1,6 +1,20 @@
 import prismadb from "@/lib/prismadb";
 import { NextResponse } from "next/server";
 
+export async function GET(
+  req: Request,
+  { params }: { params: { eventId: string } }
+) {
+  try {
+    const event = await prismadb.event.findFirst({
+      where: { id: params.eventId },
+    });
+    return NextResponse.json(event);
+  } catch (error) {
+    return new NextResponse("Internal error", { status: 500 });
+  }
+}
+
 export async function PATCH(
   req: Request,
   { params }: { params: { eventId: string } }

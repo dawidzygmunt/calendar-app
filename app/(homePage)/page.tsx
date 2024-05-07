@@ -69,7 +69,7 @@ const HomePage = () => {
           id={selectedEventId}
         />
       )}
-      <Box m={5} marginInline="20rem">
+      <Box className="m-10 xl:mx-32">
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin]}

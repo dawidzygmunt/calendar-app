@@ -7,7 +7,7 @@ export const useEventTypeDelete = () => {
   return useMutation({
     mutationKey: ["deleteEventType"],
     mutationFn: async (eventType: EventType) => {
-      return await eventTypeClient.delete(eventType);
+      return await eventTypeClient.delete(eventType.id);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["eventTypes"] });
