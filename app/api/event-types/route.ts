@@ -1,7 +1,7 @@
 import prismadb from "@/lib/prismadb";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const eventTypes = await prismadb.eventType.findMany();
     return NextResponse.json(eventTypes);
