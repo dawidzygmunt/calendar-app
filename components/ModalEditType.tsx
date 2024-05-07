@@ -47,11 +47,11 @@ const ModalEditType = ({ isOpen, onClose, selectedType }: Props) => {
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="green" onClick={handeClickEdit}>
-            Edit
-          </Button>
-          <Button colorScheme="blue" mr={3} onClick={onClose}>
+          <Button colorScheme="red" marginInline={3} onClick={onClose}>
             Close
+          </Button>
+          <Button colorScheme="blue" onClick={handeClickEdit}>
+            Submit
           </Button>
         </ModalFooter>
       </ModalContent>

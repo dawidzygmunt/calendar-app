@@ -116,11 +116,11 @@ const ModalAddEvent = ({ isOpen, onClose }: Props) => {
         </ModalBody>
 
         <ModalFooter>
-          <Button onClick={handleClickAdd} colorScheme="green" variant="solid">
-            Add
-          </Button>
-          <Button colorScheme="red" mr={3} onClick={onClose}>
+          <Button colorScheme="red" marginInline={3} onClick={onClose}>
             Close
+          </Button>
+          <Button onClick={handleClickAdd} colorScheme="blue" variant="solid">
+            Add
           </Button>
         </ModalFooter>
       </ModalContent>
