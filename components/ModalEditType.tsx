@@ -12,6 +12,8 @@ import {
 import { useLayoutEffect, useState } from 'react'
 import { EventType } from '../hooks/eventType/useEventTypes'
 import { useEventTypeEdit } from '../hooks/eventType/useEventTypeEdit'
+import { AddEventSchema, EditEventType } from '@/lib/types'
+import toast from 'react-hot-toast'
 
 interface Props {
   isOpen: boolean
@@ -26,6 +28,16 @@ const ModalEditType = ({ isOpen, onClose, selectedType }: Props) => {
 
   const handeClickEdit = () => {
     modifyEventType({ name: input })
+
+    const result = EditEventType.safeParse({ name: input })
+    if (!result.success) {
+      let errors = ''
+      result.error.issues.forEach((issue) => {
+        errors = errors + issue.path[0] + ": " + issue.message + '. '
+      })
+      toast.error(errors)
+      return
+    }
     onClose()
   }
 
@@ -38,22 +50,24 @@ const ModalEditType = ({ isOpen, onClose, selectedType }: Props) => {
       <ModalContent>
         <ModalHeader>Edit Type Event</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          <Input
-            placeholder="Event Name"
-            value={input}
-            onChange={handleChange}
-          />
-        </ModalBody>
+        <form action={handeClickEdit}>
+          <ModalBody>
+            <Input
+              placeholder="Event Name"
+              value={input}
+              onChange={handleChange}
+            />
+          </ModalBody>
 
-        <ModalFooter>
-          <Button colorScheme="red" marginInline={3} onClick={onClose}>
-            Close
-          </Button>
-          <Button colorScheme="blue" onClick={handeClickEdit}>
-            Submit
-          </Button>
-        </ModalFooter>
+          <ModalFooter>
+            <Button colorScheme="red" marginInline={3} onClick={onClose}>
+              Close
+            </Button>
+            <Button colorScheme="blue" type='submit'>
+              Submit
+            </Button>
+          </ModalFooter>
+        </form>
       </ModalContent>
     </Modal>
   )

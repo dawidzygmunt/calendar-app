@@ -5,6 +5,9 @@ export async function GET(
   req: Request,
   { params }: { params: { eventId: string } }
 ) {
+  if (!params.eventId) {
+    return new NextResponse("Missing event Id", { status: 400 });
+  }
   try {
     const event = await prismadb.event.findFirst({
       where: { id: params.eventId },
@@ -19,9 +22,21 @@ export async function PATCH(
   req: Request,
   { params }: { params: { eventId: string } }
 ) {
+  if (!params.eventId) {
+    return new NextResponse("Missing event Id", { status: 400 });
+  }
+  const body = await req.json();
+  const { name, startDate, endDate, eventTypeId } = body;
+  if (!name || !startDate || !endDate || !eventTypeId) {
+    return new NextResponse("Missing required fields", { status: 400 });
+  }
+
+  if (startDate >= endDate) {
+    return new NextResponse("Start date must be before end date", {
+      status: 400,
+    });
+  }
   try {
-    const body = await req.json();
-    const { name, startDate, endDate, eventTypeId } = body;
     const event = await prismadb.event.update({
       where: {
         id: params.eventId,
@@ -43,6 +58,9 @@ export async function DELETE(
   req: Request,
   { params }: { params: { eventId: string } }
 ) {
+  if (!params.eventId) {
+    return new NextResponse("Missing event Id", { status: 400 });
+  }
   try {
     const event = await prismadb.event.delete({
       where: { id: params.eventId },

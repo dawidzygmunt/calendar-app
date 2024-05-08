@@ -25,6 +25,8 @@ import convertDateTimeToDate from '../helpers/convertDateTimeToDate'
 import { useEventEdit } from '../hooks/events/useEventEdit'
 import useEvent from '../hooks/events/useEvent'
 import { useEventDelete } from '@/hooks/events/useEventDelete'
+import { AddEventSchema } from '@/lib/types'
+import toast from 'react-hot-toast'
 
 
 interface Props {
@@ -111,7 +113,25 @@ const ModalEditEvent = ({ isOpen, onClose, id }: Props) => {
   const handleChangeType = (e: React.ChangeEvent<HTMLSelectElement>) =>
     setSelectedType(e.target.value)
 
-  const handleClickAdd = () => {
+  const handleClickAdd = (formData: FormData) => {
+    const newEvent = {
+      name: formData.get("name"),
+      startDate: formData.get(FORM_NAMES.START_DATE),
+      endDate: formData.get(FORM_NAMES.END_DATE),
+      eventTypeId: formData.get("eventType")
+    }
+
+
+    const result = AddEventSchema.safeParse(newEvent)
+    if (!result.success) {
+      let errors = ''
+      result.error.issues.forEach((issue) => {
+        errors = errors + issue.path[0] + ": " + issue.message + '. '
+      })
+      toast.error(errors)
+      return
+    }
+
     editEvent({
       name: form[FORM_NAMES.NAME] || '',
       startDate: convertDateTimeToDate(
@@ -133,115 +153,118 @@ const ModalEditEvent = ({ isOpen, onClose, id }: Props) => {
       <ModalContent>
         <ModalHeader>Edit Event</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          {isPending ? (
-            <CircularProgress isIndeterminate />
-          ) : (
-            <>
-              <FormControl>
-                <FormLabel>Event Name</FormLabel>
-                <Input
-                  placeholder="Event Name"
-                  name={FORM_NAMES.NAME}
-                  value={form[FORM_NAMES.NAME]}
-                  onChange={(e) => handleChangeForm(e)}
-                />
-              </FormControl>
-
-              <FormControl display="flex" alignItems="center" py={3}>
-                <Switch
-                  id="all-day-switch"
-                  isChecked={isAllDayEvent}
-                  onChange={handleChangeIsAllDay}
-                />
-                <FormLabel htmlFor="all-day-switch" ml="2" mb="0">
-                  All day Event
-                </FormLabel>
-              </FormControl>
-              <FormControl>
-                <FormLabel>Start Date</FormLabel>
-                <Input
-                  placeholder="Start Date"
-                  type="date"
-                  name={FORM_NAMES.START_DATE}
-                  value={form[FORM_NAMES.START_DATE]}
-                  onChange={(e) => handleChangeForm(e)}
-                />
-              </FormControl>
-
-              {!isAllDayEvent && (
+        <form action={handleClickAdd}>
+          <ModalBody>
+            {isPending ? (
+              <CircularProgress isIndeterminate />
+            ) : (
+              <>
                 <FormControl>
-                  <FormLabel>Start Hour</FormLabel>
+                  <FormLabel>Event Name</FormLabel>
                   <Input
-                    placeholder="Start Hour"
-                    type="time"
-                    name={FORM_NAMES.START_HOUR}
-                    value={form[FORM_NAMES.START_HOUR]}
+                    placeholder="Event Name"
+                    name={FORM_NAMES.NAME}
+                    value={form[FORM_NAMES.NAME]}
                     onChange={(e) => handleChangeForm(e)}
                   />
                 </FormControl>
-              )}
-              <FormControl>
-                <FormLabel>End Date</FormLabel>
-                <Input
-                  placeholder="End Date"
-                  type="date"
-                  name={FORM_NAMES.END_DATE}
-                  value={form[FORM_NAMES.END_DATE]}
-                  onChange={(e) => handleChangeForm(e)}
-                />
-              </FormControl>
 
-              {!isAllDayEvent && (
+                <FormControl display="flex" alignItems="center" py={3}>
+                  <Switch
+                    id="all-day-switch"
+                    isChecked={isAllDayEvent}
+                    onChange={handleChangeIsAllDay}
+                  />
+                  <FormLabel htmlFor="all-day-switch" ml="2" mb="0">
+                    All day Event
+                  </FormLabel>
+                </FormControl>
                 <FormControl>
-                  <FormLabel>End Hour</FormLabel>
+                  <FormLabel>Start Date</FormLabel>
                   <Input
-                    placeholder="End Hour"
-                    type="time"
-                    name={FORM_NAMES.END_HOUR}
-                    value={form[FORM_NAMES.END_HOUR]}
+                    placeholder="Start Date"
+                    type="date"
+                    name={FORM_NAMES.START_DATE}
+                    value={form[FORM_NAMES.START_DATE]}
                     onChange={(e) => handleChangeForm(e)}
                   />
                 </FormControl>
-              )}
 
-              <Select
-                placeholder="Select type event"
-                value={selectedType}
-                onChange={handleChangeType}
-              >
-                {eventTypes?.map(({ id, name }) => (
-                  <option key={id} value={id}>
-                    {name}
-                  </option>
-                ))}
-              </Select>
-            </>
-          )}
-        </ModalBody>
+                {!isAllDayEvent && (
+                  <FormControl>
+                    <FormLabel>Start Hour</FormLabel>
+                    <Input
+                      placeholder="Start Hour"
+                      type="time"
+                      name={FORM_NAMES.START_HOUR}
+                      value={form[FORM_NAMES.START_HOUR]}
+                      onChange={(e) => handleChangeForm(e)}
+                    />
+                  </FormControl>
+                )}
+                <FormControl>
+                  <FormLabel>End Date</FormLabel>
+                  <Input
+                    placeholder="End Date"
+                    type="date"
+                    name={FORM_NAMES.END_DATE}
+                    value={form[FORM_NAMES.END_DATE]}
+                    onChange={(e) => handleChangeForm(e)}
+                  />
+                </FormControl>
 
-        <ModalFooter display="flex" width="100%" justifyContent="space-between">
-          <Button
-            onClick={() => {
-              onClose();
-              deleteEvent()
-            }
-            }
-            colorScheme="red"
-            variant="solid"
-            marginInline={2}
-          >
-            Delete
-          </Button>
-          <Box>
-            <Button colorScheme="orange" marginInline={3} onClick={onClose}>
-              Close
+                {!isAllDayEvent && (
+                  <FormControl>
+                    <FormLabel>End Hour</FormLabel>
+                    <Input
+                      placeholder="End Hour"
+                      type="time"
+                      name={FORM_NAMES.END_HOUR}
+                      value={form[FORM_NAMES.END_HOUR]}
+                      onChange={(e) => handleChangeForm(e)}
+                    />
+                  </FormControl>
+                )}
+
+                <Select
+                  placeholder="Select type event"
+                  name="eventType"
+                  value={selectedType}
+                  onChange={handleChangeType}
+                >
+                  {eventTypes?.map(({ id, name }) => (
+                    <option key={id} value={id}>
+                      {name}
+                    </option>
+                  ))}
+                </Select>
+              </>
+            )}
+          </ModalBody>
+
+          <ModalFooter display="flex" width="100%" justifyContent="space-between">
+            <Button
+              onClick={() => {
+                onClose();
+                deleteEvent()
+              }
+              }
+              colorScheme="red"
+              variant="solid"
+              marginInline={2}
+            >
+              Delete
             </Button>
-            <Button onClick={handleClickAdd} colorScheme="blue" variant="solid">
-              Submit
-            </Button>
-          </Box>
-        </ModalFooter>
+            <Box>
+              <Button colorScheme="orange" marginInline={3} onClick={onClose}>
+                Close
+              </Button>
+              <Button type='submit' colorScheme="blue" variant="solid">
+                Submit
+              </Button>
+            </Box>
+          </ModalFooter>
+        </form>
       </ModalContent>
     </Modal>
   )

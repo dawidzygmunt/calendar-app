@@ -1,5 +1,6 @@
 import Navbar from '@/components/navbar';
 import React from 'react'
+import toast, { Toaster } from 'react-hot-toast';
 
 export default async function DashboardLayou({
   children,
@@ -8,6 +9,7 @@ export default async function DashboardLayou({
 }) {
   return (
     <div>
+      <Toaster />
       <Navbar />
       {children}
     </div>

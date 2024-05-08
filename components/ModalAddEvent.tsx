@@ -12,10 +12,25 @@ import {
   ModalOverlay,
   Select,
   Switch,
+  Toast,
 } from '@chakra-ui/react'
 import { useRef, useState } from 'react'
 import useEventTypes from '../hooks/eventType/useEventTypes'
 import { useEventCreate } from '../hooks/events/useEventCreate'
+import { z } from "zod"
+import toast from 'react-hot-toast'
+
+const formSchema = z.object({
+  name: z.string().min(2).max(15),
+  startDate: z.string().min(8, { message: "Date is required" }),
+  endDate: z.string().min(8, { message: "Date is required" }),
+  startHour: z.string().optional(),
+  endOfHour: z.string().optional(),
+  eventTypeId: z.string().min(4, { message: "Event Type is required" }),
+})
+
+
+
 
 interface Props {
   isOpen: boolean
@@ -44,9 +59,26 @@ const ModalAddEvent = ({ isOpen, onClose }: Props) => {
   const handleChangeType = (e: React.ChangeEvent<HTMLSelectElement>) =>
     setSelectedType(e.target.value)
 
-  const handleClickAdd = () => {
+  const handleClickAdd = async (formData: FormData) => {
     const start = startDateRef.current?.value || ''
     const end = endDateRef.current?.value || ''
+
+    const newEvent = {
+      name: formData.get("name"),
+      startDate: formData.get("startDate"),
+      endDate: formData.get("endDate"),
+      eventTypeId: formData.get("eventType")
+    }
+
+    const result = formSchema.safeParse(newEvent)
+    if (!result.success) {
+      let errors = ''
+      result.error.issues.forEach((issue) => {
+        errors = errors + issue.path[0] + ": " + issue.message + '. '
+      })
+      toast.error(errors)
+      return
+    }
 
     addEvent({
       name: nameInputRef.current?.value || '',
@@ -63,68 +95,72 @@ const ModalAddEvent = ({ isOpen, onClose }: Props) => {
       <ModalContent>
         <ModalHeader>Add Type Event</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          <FormControl>
-            <FormLabel>Event Name</FormLabel>
-            <Input ref={nameInputRef} placeholder="Event Name" />
-          </FormControl>
-
-          <FormControl display="flex" alignItems="center" py={3}>
-            <Switch
-              id="all-day-switch"
-              isChecked={isAllDayEvent}
-              onChange={handleChangeIsAllDay}
-            />
-            <FormLabel htmlFor="all-day-switch" ml="2" mb="0">
-              All day Event
-            </FormLabel>
-          </FormControl>
-          <FormControl>
-            <FormLabel>Start Date</FormLabel>
-            <Input ref={startDateRef} placeholder="Start Date" type="date" />
-          </FormControl>
-
-          {!isAllDayEvent && (
+        <form action={handleClickAdd}>
+          <ModalBody>
             <FormControl>
-              <FormLabel>Start Hour</FormLabel>
-              <Input ref={startHourRef} placeholder="Start Hour" type="time" />
+              <FormLabel>Event Name</FormLabel>
+              <Input ref={nameInputRef} name='name' placeholder="Event Name" />
             </FormControl>
-          )}
-          <FormControl>
-            <FormLabel>End Date</FormLabel>
-            <Input ref={endDateRef} placeholder="Start Date" type="date" />
-          </FormControl>
 
-          {!isAllDayEvent && (
+            <FormControl display="flex" alignItems="center" py={3}>
+              <Switch
+                id="all-day-switch"
+                isChecked={isAllDayEvent}
+                onChange={handleChangeIsAllDay}
+              />
+              <FormLabel htmlFor="all-day-switch" ml="2" mb="0">
+                All day Event
+              </FormLabel>
+            </FormControl>
             <FormControl>
-              <FormLabel>End Hour</FormLabel>
-              <Input ref={endHourRef} placeholder="Start Hour" type="time" />
+              <FormLabel>Start Date</FormLabel>
+              <Input ref={startDateRef} name='startDate' placeholder="Start Date" type="date" />
             </FormControl>
-          )}
 
-          <Select
-            placeholder="Select type event"
-            value={selectedType}
-            onChange={handleChangeType}
-          >
-            {eventTypes?.map(({ id, name }) => (
-              <option key={id} value={id}>
-                {name}
-              </option>
-            ))}
-          </Select>
-        </ModalBody>
+            {!isAllDayEvent && (
+              <FormControl>
+                <FormLabel>Start Hour</FormLabel>
+                <Input ref={startHourRef} name='startHour' placeholder="Start Hour" type="time" />
+              </FormControl>
+            )}
+            <FormControl>
+              <FormLabel>End Date</FormLabel>
+              <Input ref={endDateRef} name='endDate' placeholder="Start Date" type="date" />
+            </FormControl>
 
-        <ModalFooter>
-          <Button colorScheme="red" marginInline={3} onClick={onClose}>
-            Close
-          </Button>
-          <Button onClick={handleClickAdd} colorScheme="blue" variant="solid">
-            Add
-          </Button>
-        </ModalFooter>
+            {!isAllDayEvent && (
+              <FormControl>
+                <FormLabel>End Hour</FormLabel>
+                <Input ref={endHourRef} name='endHour' placeholder="Start Hour" type="time" />
+              </FormControl>
+            )}
+            <FormLabel>Select Event Type</FormLabel>
+            <Select
+              placeholder='Select Event'
+              name='eventType'
+              value={selectedType}
+              onChange={handleChangeType}
+            >
+              {eventTypes?.map(({ id, name }) => (
+                <option key={id} value={id}>
+                  {name}
+                </option>
+              ))}
+            </Select>
+
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="red" marginInline={3} onClick={onClose}>
+              Close
+            </Button>
+            <Button type='submit' colorScheme="blue" variant="solid">
+              Add
+            </Button>
+          </ModalFooter>
+        </form>
       </ModalContent>
-    </Modal>
+    </Modal >
   )
 }
 
